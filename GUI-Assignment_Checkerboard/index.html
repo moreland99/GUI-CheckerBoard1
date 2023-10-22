@@ -2,7 +2,6 @@
 
 <!--
   COLLABORATORS:
-  
 -->
 
 <html>
@@ -24,80 +23,126 @@
 	//data model
 	var board;
 
-// This allows the Javascript code inside this block to only run when the page
-// has finished loading in the browser.
-$(document).ready(function() {
+	// Function to draw the checkerboard using the stroke approach
+	function drawCheckerboard() {
+	    const canvas = document.getElementById('checkerboard');
+	    const ctx = canvas.getContext('2d');
+	    const BOARD_SIZE = getBoardSizeFromURL() || DEFAULT_BOARD_SIZE;
+	    const SQUARE_SIZE = 400 / BOARD_SIZE;
 
-	if ($.getUrlVar('size') && $.getUrlVar('size') >= 6){
-		board = new Board($.getUrlVar('size'));
-	} else {
-		board = new Board(DEFAULT_BOARD_SIZE);
+	    for (let row = 0; row < BOARD_SIZE; row++) {
+	        for (let col = 0; col < BOARD_SIZE; col++) {
+	            ctx.fillStyle = (row + col) % 2 === 0 ? 'white' : 'black';
+	            ctx.fillRect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+	        }
+	    }
 	}
-	
-	// Your code here
 
-	board.addEventListener('add',function (e) {
-		// Your code here
-	},true);
+	function drawCheckers() {
+    const checkersContainer = document.getElementById('checkersContainer');
+    checkersContainer.innerHTML = ''; // Clear previous checkers
 
-	board.addEventListener('move',function (e) {
-		// Your code here
-	},true);
+    for (let row = 0; row < board.size; row++) {
+        for (let col = 0; col < board.size; col++) {
+            const checker = board.getCheckerAt(row, col);
+            if (checker) {
+                const checkerElement = document.createElement('div');
 
-	board.addEventListener('remove',function (e) {
-		// Your code here
-	},true);
-
-	board.addEventListener('promote',function (e) {
-		// Your code here
-	},true);
-
-	$("#btnNewGame").click(function(evt) {
-		board.prepareNewGame();
-	});
-
-	$("#btnMoveRandomly").click(function(evt) {
-		randomChecker = board.getRandomChecker();
-		randomLoc = board.getRandomEmptyLocation();
-		
-		if (randomChecker && randomLoc){
-			board.moveTo(randomChecker, randomLoc.row, randomLoc.col);
-		}
-	});
-
-	$("#btnKingRandomly").click(function(evt) {
-		randomChecker = board.getRandomNonKing();
-		board.promote(randomChecker);
-	});
-
-	$("#btnClear").click(function(evt) {
-		board.clear();
-	});
-
-	board.prepareNewGame();
-});
-
-// This script extracts parameters from the URL
-// from jquery-howto.blogspot.com
-$.extend({
-  getUrlVars: function(){
-    var vars = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    for(var i = 0; i < hashes.length; i++)
-    {
-      hash = hashes[i].split('=');
-      vars.push(hash[0]);
-      vars[hash[0]] = hash[1];
+				checkerElement.classList.add('checker', `${checker.color}-${checker.isKing ? 'king' : 'piece'}`);
+				
+                checkerElement.style.position = 'absolute';
+                checkerElement.style.width = `${400 / board.size}px`;
+                checkerElement.style.height = `${400 / board.size}px`;
+                checkerElement.style.left = `${col * (400 / board.size)}px`;
+                checkerElement.style.top = `${row * (400 / board.size)}px`;
+                checkerElement.style.backgroundImage = `url('graphics/${checker.color}-${checker.isKing ? 'king' : 'piece'}.png')`;
+                checkerElement.style.backgroundSize = 'contain';
+                checkersContainer.appendChild(checkerElement);
+            }
+        }
     }
-    return vars;
-  },
-  getUrlVar: function(name){
-    return $.getUrlVars()[name];
-  }
-});
+}
+
+
+	function getBoardSizeFromURL() {
+	    const params = new URLSearchParams(window.location.search);
+	    return parseInt(params.get('size'));
+	}
+
+	// This allows the Javascript code inside this block to only run when the page
+	// has finished loading in the browser.
+	$(document).ready(function() {
+	    if ($.getUrlVar('size') && $.getUrlVar('size') >= 6){
+	        board = new Board($.getUrlVar('size'));
+	    } else {
+	        board = new Board(DEFAULT_BOARD_SIZE);
+	    }
+
+	    board.addEventListener('add',function (e) {
+	        drawCheckers();
+	    },true);
+
+	    board.addEventListener('move',function (e) {
+	        drawCheckers();
+	    },true);
+
+	    board.addEventListener('remove',function (e) {
+	        drawCheckers();
+	    },true);
+
+	    board.addEventListener('promote',function (e) {
+	        drawCheckers();
+	    },true);
+
+	    $("#btnNewGame").click(function(evt) {
+	        board.prepareNewGame();
+	    });
+
+	    $("#btnMoveRandomly").click(function(evt) {
+	        randomChecker = board.getRandomChecker();
+	        randomLoc = board.getRandomEmptyLocation();
+
+	        if (randomChecker && randomLoc){
+	            board.moveTo(randomChecker, randomLoc.row, randomLoc.col);
+	        }
+	    });
+
+	    $("#btnKingRandomly").click(function(evt) {
+	        randomChecker = board.getRandomNonKing();
+	        board.promote(randomChecker);
+	    });
+
+	    $("#btnClear").click(function(evt) {
+	        board.clear();
+	    });
+
+	    board.prepareNewGame();
+
+	    // Call the function to draw the checkerboard
+	    drawCheckerboard();
+		drawCheckers();
+	});
+
+	// This script extracts parameters from the URL
+	// from jquery-howto.blogspot.com
+	$.extend({
+	  getUrlVars: function(){
+	    var vars = [], hash;
+	    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	    for(var i = 0; i < hashes.length; i++)
+	    {
+	      hash = hashes[i].split('=');
+	      vars.push(hash[0]);
+	      vars[hash[0]] = hash[1];
+	    }
+	    return vars;
+	  },
+	  getUrlVar: function(name){
+	    return $.getUrlVars()[name];
+	  }
+	});
 
 </script>
-
 
 </head>
 
@@ -113,14 +158,14 @@ $.extend({
 				<tr><td><input id="btnClear" type="button" name="clear" value="Clear"/></td></tr>
 			</table>
 		</td>
-
 		<td id="content">
-			<!-- Your code here -->
+			<canvas id="checkerboard" width="400" height="400"></canvas>
+			<div id="checkersContainer"></div>
 		</td>
 	</tr>
-	
-   </table>
+</table>
 
 </body>
 
 </html>
+

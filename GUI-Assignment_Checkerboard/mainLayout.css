@@ -13,3 +13,34 @@
 #content{
 	background-color:gray;
 }
+
+#checkersContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 400px;
+    height: 400px;
+}
+
+.checker {
+    width: 50px; /* Adjust based on your board size */
+    height: 50px;
+    position: absolute;
+    background-size: cover;
+}
+
+.red-piece {
+    background-image: url('graphics/red-piece.png');
+}
+
+.black-piece {
+    background-image: url('graphics/black-piece.png');
+}
+
+.red-king {
+    background-image: url('graphics/red-king.png');
+}
+
+.black-king {
+    background-image: url('graphics/black-king.png');
+}
